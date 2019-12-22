@@ -119,7 +119,8 @@ class train_network():
         win_cnt = defaultdict(int)
         total_turn=0
         for i in range(n_games):
-            winner,turn = self.game.play(current_mcts_player,pure_mcts_player,start_player=i % 2,random=self.randomized)
+            #winner,turn = self.game.play(current_mcts_player,pure_mcts_player,start_player=i % 2,random=self.randomized)
+            winner,turn = self.game.play(current_mcts_player,baseline_player,start_player=i % 2,random=self.randomized)
             #winner,turn= self.game.play(current_mcts_player,baseline_player,start_player=i % 2)
             #winner,turn= self.game.play(pure_mcts_player,baseline_player,start_player=i % 2)
             win_cnt[winner] += 1
@@ -180,7 +181,7 @@ class randomPlayer(object):
     def __str__(self):
         return "BASE {}".format(self.player)
 if __name__ == '__main__':
-    training_pipeline = train_network(game_size=5,game_goal=3,randomized=True,folder_name="runs/64")
+    training_pipeline = train_network(game_size=5,game_goal=3,randomized=True,folder_name="runs/game64r")
     training_pipeline.run()
-    training_pipeline = train_network(game_size=5,game_goal=3,randomized=True,folder_name="runs/53")
+    training_pipeline = train_network(game_size=5,game_goal=3,randomized=True,folder_name="runs/game53r")
     training_pipeline.run()

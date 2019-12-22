@@ -119,8 +119,8 @@ class train_network():
         win_cnt = defaultdict(int)
         total_turn=0
         for i in range(n_games):
-            #winner,turn = self.game.play(current_mcts_player,pure_mcts_player,start_player=i % 2,random=self.randomized)
-            winner,turn = self.game.play(current_mcts_player,baseline_player,start_player=i % 2,random=self.randomized)
+            winner,turn = self.game.play(current_mcts_player,pure_mcts_player,start_player=i % 2,random=self.randomized)
+            #winner,turn = self.game.play(current_mcts_player,baseline_player,start_player=i % 2,random=self.randomized)
             #winner,turn= self.game.play(current_mcts_player,baseline_player,start_player=i % 2)
             #winner,turn= self.game.play(pure_mcts_player,baseline_player,start_player=i % 2)
             win_cnt[winner] += 1
@@ -156,7 +156,7 @@ class train_network():
                     self.writer.add_scalar('winning_rate',win_ratio,i+1)
                     self.policy_value_net.save_model('./current_policy.model')
                     if win_ratio > self.best_win_ratio:
-                        print("New best policy!!!!!!!!")
+                        #print("New best policy!!!!!!!!")
                         self.best_win_ratio = win_ratio
                         # update the best_policy
                         self.policy_value_net.save_model('./best_policy.model')
@@ -181,9 +181,5 @@ class randomPlayer(object):
     def __str__(self):
         return "BASE {}".format(self.player)
 if __name__ == '__main__':
-    training_pipeline = train_network(game_size=5,game_goal=3,randomized=False,folder_name="runs/game64")
-    training_pipeline.run()
-    training_pipeline = train_network(game_size=5,game_goal=3,randomized=False,folder_name="runs/game53")
-    training_pipeline.run()
-    training_pipeline = train_network(game_size=4,game_goal=3,randomized=False,folder_name="runs/game64")
+    training_pipeline = train_network(game_size=5,game_goal=3,randomized=True,folder_name="runs/game_test53")
     training_pipeline.run()
