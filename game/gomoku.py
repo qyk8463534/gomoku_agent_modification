@@ -100,14 +100,18 @@ class gomoku(object):#state object
                 
         self.last_move = move
         return self.last_move
-    def do_move(self, move):
-        self.states[move] = self.current_player
-        self.availables.remove(move)
-        self.current_player = (
-            self.players[0] if self.current_player == self.players[1]
-            else self.players[1]
-        )
-        self.last_move = move
+    def do_move(self, move,random=False):
+        if not random:
+            self.states[move] = self.current_player
+            self.availables.remove(move)
+            self.current_player = (
+                self.players[0] if self.current_player == self.players[1]
+                else self.players[1]
+            )
+            self.last_move = move
+        else:
+            self.rdo_move(move)
+        
 
     def has_a_winner(self):
         width = self.width
@@ -159,7 +163,7 @@ class Game(object):#create a game start with a not finished board
     def __init__(self,board):
         self.board=board
                     
-    def play(self, player1,player2,start_player=0, is_shown=1):
+    def play(self, player1,player2,start_player=0, is_shown=1,random=False):
         if start_player not in (0, 1):
             raise Exception('start_player should be either 0 (player1 first) '
                             'or 1 (player2 first)')
@@ -182,23 +186,23 @@ class Game(object):#create a game start with a not finished board
             current_player = self.board.get_current_player()
             player_in_turn = players[current_player]
             move= player_in_turn.action(self.board)
-            self.board.do_move(move)
+            self.board.do_move(move,random)
             #self.board.rdo_move(move)
             turn+=1
-    def self_play_MCTS(self,player,is_shown=0,temp=1e-3):
+    def self_play_MCTS(self,player,is_shown=0,temp=1e-3,random=False):
         self.board.init_board()
         p1, p2 = self.board.players
         states, mcts_probs, current_players = [], [], []
         while True:
             move, move_probs = player.action(self.board,
                                                  temp=temp,
-                                                 )
+                                                 random=random)
             # store the data
             states.append(self.board.current_state())
             mcts_probs.append(move_probs)
             current_players.append(self.board.current_player)
             # perform a move
-            self.board.do_move(move)
+            self.board.do_move(move,random=random)
             #self.board.rdo_move(move)
             end, winner = self.board.game_end()
             if end:

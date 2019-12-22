@@ -111,7 +111,7 @@ class MCTS(object):
         self._c_puct = c_puct
         self._n_playout = n_playout
 
-    def _playout(self, state):
+    def _playout(self, state,random):
         """Run a single playout from the root to the leaf, getting a value at
         the leaf and propagating it back through its parents.
         State is modified in-place, so a copy must be provided.
@@ -123,7 +123,7 @@ class MCTS(object):
                 break
             # Greedily select next move.
             action, node = node.select(self._c_puct)
-            state.do_move(action)
+            state.do_move(action,random)
             #state.rdo_move(action)
 
         action_probs, _ = self._policy(state)
@@ -136,7 +136,7 @@ class MCTS(object):
         # Update value and visit count of nodes in this traversal.
         node.update_recursive(-leaf_value)
 
-    def _evaluate_rollout(self, state, limit=1000):
+    def _evaluate_rollout(self, state, limit=1000,random=False):
         """Use the rollout policy to play until the end of the game,
         returning +1 if the current player wins, -1 if the opponent wins,
         and 0 if it is a tie.
@@ -148,7 +148,7 @@ class MCTS(object):
                 break
             action_probs = rollout_policy_fn(state)
             max_action = max(action_probs, key=itemgetter(1))[0]
-            state.do_move(max_action)
+            state.do_move(max_action,random)
             #state.rdo_move(max_action)
         else:
             # If no break from the loop, issue a warning.
@@ -158,7 +158,7 @@ class MCTS(object):
         else:
             return 1.0 if winner == player else -1.0
 
-    def get_move(self, state):
+    def get_move(self, state,random):
         """Runs all playouts sequentially and returns the most visited action.
         state: the current game state
 
@@ -166,7 +166,7 @@ class MCTS(object):
         """
         for n in range(self._n_playout):
             state_copy = copy.deepcopy(state)
-            self._playout(state_copy)
+            self._playout(state_copy,random)
         return max(self._root._children.items(),
                    key=lambda act_node: act_node[1]._n_visits)[0]
 
@@ -195,10 +195,10 @@ class MCTSPlayer(object):
     def reset_player(self):
         self.mcts.update_with_move(-1)
 
-    def action(self, board):
+    def action(self, board,random=False):
         sensible_moves = board.availables
         if len(sensible_moves) > 0:
-            move = self.mcts.get_move(board)
+            move = self.mcts.get_move(board,random)
             self.mcts.update_with_move(-1)
             return move
         else:

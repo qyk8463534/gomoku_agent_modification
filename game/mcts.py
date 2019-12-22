@@ -50,7 +50,7 @@ class MCTS(object):
         self.para = para
         self.n_play=n_play
 
-    def play(self, state):#state is a gomoku board instance;a single play
+    def play(self, state,random=False):#state is a gomoku board instance;a single play
         '''node=self.root
         while not node.is_leaf():
             a,node=node.select(self.para)
@@ -71,7 +71,7 @@ class MCTS(object):
             # Greedily select next move.
             a, node = node.select(self.para)
             #print(state.current_player)
-            state.do_move(a)
+            state.do_move(a,random)
             #state.rdo_move(a)
             
         # Evaluate the leaf using a network which outputs a list of
@@ -94,10 +94,10 @@ class MCTS(object):
         
         # Update value and visit count of nodes in this traversal.
 
-    def get_move_p(self,state,temp=1e-3):
+    def get_move_p(self,state,temp=1e-3,random=False):
         for i in range(self.n_play):
             state_rep=copy.deepcopy(state)
-            self.play(state_rep)
+            self.play(state_rep,random)
         a_visits=[(a,node.N) for a,node in self.root.children.items()]
         a,visits=zip(*a_visits)
         a_p=softmax(1.0/temp*np.log(np.array(visits)+1e-10))
@@ -118,11 +118,11 @@ class MCTS_Player(object):#a agent to play game
         self.mcts.update_move(-1)
     def set_player_ind(self, p):
         self.player = p
-    def action(self,board,temp=1e-3):
+    def action(self,board,temp=1e-3,random=False):
         available_moves=board.availables
         move_p=np.zeros(board.size**2)
         if len(available_moves)>0:
-            a,p=self.mcts.get_move_p(board,temp)
+            a,p=self.mcts.get_move_p(board,temp,random)
             move_p[list(a)]=p
             if self.is_selfplay:
                 #p_net,_=self.mcts.network(board)
